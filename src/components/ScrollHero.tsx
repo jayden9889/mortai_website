@@ -97,15 +97,15 @@ function drawCalendar(
   opacity: number,
   slots: CalendarSlot[]
 ): CalendarSlot[] {
-  const calWidth = 280;
-  const calHeight = 200;
+  const calWidth = 400;
+  const calHeight = 300;
   const left = centerX - calWidth / 2;
   const top = centerY - calHeight / 2;
   const rows = 4;
   const cols = 5;
+  const headerHeight = 45;
   const cellWidth = calWidth / cols;
-  const cellHeight = (calHeight - 30) / rows; // 30px for header
-  const headerHeight = 30;
+  const cellHeight = (calHeight - headerHeight) / rows;
 
   // Calendar background with glow
   ctx.shadowColor = 'rgba(0, 255, 229, 0.4)';
@@ -135,16 +135,16 @@ function drawCalendar(
 
   // Header text
   ctx.fillStyle = `rgba(0, 255, 229, ${opacity})`;
-  ctx.font = 'bold 14px system-ui, sans-serif';
+  ctx.font = 'bold 18px system-ui, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('Your Calendar', centerX, top + 20);
+  ctx.fillText('Your Calendar', centerX, top + 28);
 
   // Day headers
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-  ctx.font = '10px system-ui, sans-serif';
+  ctx.font = '13px system-ui, sans-serif';
   ctx.fillStyle = `rgba(0, 212, 200, ${0.7 * opacity})`;
   days.forEach((day, i) => {
-    ctx.fillText(day, left + cellWidth * i + cellWidth / 2, top + headerHeight + 15);
+    ctx.fillText(day, left + cellWidth * i + cellWidth / 2, top + headerHeight + 20);
   });
 
   // Grid lines
@@ -343,7 +343,7 @@ export default function ScrollHero() {
         opacity: 0.7 + Math.random() * 0.3,
         speed: 0.4 + Math.random() * 0.4,
         angle: Math.random() * Math.PI * 2,
-        converted: i < 3,
+        converted: i < 5, // 5 warm leads convert
         color: 'warm',
         groupIndex: i,
       });
@@ -366,7 +366,7 @@ export default function ScrollHero() {
         opacity: 0.7 + Math.random() * 0.3,
         speed: 0.4 + Math.random() * 0.4,
         angle: Math.random() * Math.PI * 2,
-        converted: i < 3,
+        converted: i < 5, // 5 cool leads convert
         color: 'cool',
         groupIndex: i,
       });
@@ -385,13 +385,13 @@ export default function ScrollHero() {
       const funnelBottomY = height * 0.82;
 
       // Draw funnel (fades out completely before calendar appears)
-      if (progress > 0.1 && progress < 0.78) {
+      if (progress > 0.1 && progress < 0.72) {
         const funnelOpacity = progress < 0.2
           ? (progress - 0.1) / 0.1
-          : progress > 0.72
-            ? 1 - (progress - 0.72) / 0.06 // Faster fade out
+          : progress > 0.65
+            ? 1 - (progress - 0.65) / 0.07 // Fade out before Stage 3
             : 1;
-        drawFunnel(ctx, width, height, funnelOpacity);
+        drawFunnel(ctx, width, height, Math.max(0, funnelOpacity));
       }
 
       // Draw calendar in Stage 3
@@ -514,42 +514,46 @@ export default function ScrollHero() {
           const exitProgress = (progress - 0.72) / 0.28;
           const eased = 1 - Math.pow(1 - exitProgress, 3); // Smooth ease-out
 
-          // Calculate calendar slot positions
+          // Calculate calendar slot positions (match drawCalendar dimensions)
           const calendarCenterY = funnelBottomY + 120;
-          const calWidth = 280;
-          const calHeight = 200;
+          const calWidth = 400;
+          const calHeight = 300;
           const calLeft = centerX - calWidth / 2;
           const calTop = calendarCenterY - calHeight / 2;
           const cols = 5;
           const rows = 4;
+          const headerHeight = 45;
           const cellWidth = calWidth / cols;
-          const cellHeight = (calHeight - 30) / rows;
-          const headerHeight = 30;
+          const cellHeight = (calHeight - headerHeight) / rows;
 
-          // Predefined slots for converted leads (avoid row 0 to not overlap day headers)
+          // Predefined slots for 10 converted leads (spread across calendar)
           const slotAssignments = [
-            { row: 1, col: 1 }, // Tue
-            { row: 2, col: 3 }, // Thu
-            { row: 3, col: 0 }, // Mon
-            { row: 1, col: 4 }, // Fri
-            { row: 2, col: 2 }, // Wed
-            { row: 3, col: 1 }, // Tue
+            { row: 0, col: 1 }, // Tue row 1
+            { row: 1, col: 3 }, // Thu row 2
+            { row: 2, col: 0 }, // Mon row 3
+            { row: 0, col: 4 }, // Fri row 1
+            { row: 2, col: 2 }, // Wed row 3
+            { row: 1, col: 0 }, // Mon row 2
+            { row: 3, col: 3 }, // Thu row 4
+            { row: 1, col: 2 }, // Wed row 2
+            { row: 3, col: 1 }, // Tue row 4
+            { row: 2, col: 4 }, // Fri row 3
           ];
 
           if (lead.converted) {
-            const convertedIndex = lead.color === 'warm' ? lead.groupIndex : lead.groupIndex + 3;
+            const convertedIndex = lead.color === 'warm' ? lead.groupIndex : lead.groupIndex + 5;
             const slot = slotAssignments[convertedIndex % slotAssignments.length];
 
             // Start position (funnel exit)
             const startX = centerX;
             const startY = funnelBottomY + 10;
 
-            // Target position (calendar slot) - push down to avoid header overlap
+            // Target position (calendar slot) - center in cell, below day headers
             const targetX = calLeft + slot.col * cellWidth + cellWidth / 2;
-            const targetY = calTop + headerHeight + 25 + slot.row * cellHeight + cellHeight / 2;
+            const targetY = calTop + headerHeight + 30 + slot.row * cellHeight + cellHeight / 2;
 
-            // Stagger the arrival - each lead has slight delay
-            const staggerDelay = convertedIndex * 0.1;
+            // Stagger the arrival - each lead has slight delay (reduced for 10 leads)
+            const staggerDelay = convertedIndex * 0.06;
             const leadEased = Math.max(0, Math.min(1, (eased - staggerDelay) / (1 - staggerDelay)));
             const smoothEased = leadEased < 1 ? 1 - Math.pow(1 - leadEased, 2.5) : 1;
 
