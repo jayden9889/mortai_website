@@ -98,14 +98,15 @@ function drawCalendar(
   slots: CalendarSlot[]
 ): CalendarSlot[] {
   const calWidth = 400;
-  const calHeight = 300;
+  const calHeight = 380;
   const left = centerX - calWidth / 2;
   const top = centerY - calHeight / 2;
   const rows = 4;
   const cols = 5;
   const headerHeight = 45;
+  const dayHeaderSpace = 25; // Space for Mon/Tue/Wed labels
   const cellWidth = calWidth / cols;
-  const cellHeight = (calHeight - headerHeight) / rows;
+  const cellHeight = (calHeight - headerHeight - dayHeaderSpace) / rows;
 
   // Calendar background with glow
   ctx.shadowColor = 'rgba(0, 255, 229, 0.4)';
@@ -151,10 +152,12 @@ function drawCalendar(
   ctx.strokeStyle = `rgba(0, 212, 200, ${0.15 * opacity})`;
   ctx.lineWidth = 1;
 
+  const gridTop = top + headerHeight + dayHeaderSpace;
+
   // Vertical lines
   for (let i = 1; i < cols; i++) {
     ctx.beginPath();
-    ctx.moveTo(left + i * cellWidth, top + headerHeight);
+    ctx.moveTo(left + i * cellWidth, gridTop);
     ctx.lineTo(left + i * cellWidth, top + calHeight);
     ctx.stroke();
   }
@@ -162,10 +165,16 @@ function drawCalendar(
   // Horizontal lines
   for (let i = 1; i < rows; i++) {
     ctx.beginPath();
-    ctx.moveTo(left, top + headerHeight + i * cellHeight);
-    ctx.lineTo(left + calWidth, top + headerHeight + i * cellHeight);
+    ctx.moveTo(left, gridTop + i * cellHeight);
+    ctx.lineTo(left + calWidth, gridTop + i * cellHeight);
     ctx.stroke();
   }
+
+  // Line below day headers
+  ctx.beginPath();
+  ctx.moveTo(left, gridTop);
+  ctx.lineTo(left + calWidth, gridTop);
+  ctx.stroke();
 
   // Calculate slot positions
   const slotPositions: CalendarSlot[] = [];
@@ -517,14 +526,15 @@ export default function ScrollHero() {
           // Calculate calendar slot positions (match drawCalendar dimensions)
           const calendarCenterY = funnelBottomY + 120;
           const calWidth = 400;
-          const calHeight = 300;
+          const calHeight = 380;
           const calLeft = centerX - calWidth / 2;
           const calTop = calendarCenterY - calHeight / 2;
           const cols = 5;
           const rows = 4;
           const headerHeight = 45;
+          const dayHeaderSpace = 25; // Space for Mon/Tue/Wed labels
           const cellWidth = calWidth / cols;
-          const cellHeight = (calHeight - headerHeight) / rows;
+          const cellHeight = (calHeight - headerHeight - dayHeaderSpace) / rows;
 
           // Predefined slots for 10 converted leads (spread across calendar)
           const slotAssignments = [
@@ -548,9 +558,9 @@ export default function ScrollHero() {
             const startX = centerX;
             const startY = funnelBottomY + 10;
 
-            // Target position (calendar slot) - center in cell, below day headers
+            // Target position - center of cell, accounting for header and day labels
             const targetX = calLeft + slot.col * cellWidth + cellWidth / 2;
-            const targetY = calTop + headerHeight + 30 + slot.row * cellHeight + cellHeight / 2;
+            const targetY = calTop + headerHeight + dayHeaderSpace + slot.row * cellHeight + cellHeight / 2;
 
             // Stagger the arrival - each lead has slight delay (reduced for 10 leads)
             const staggerDelay = convertedIndex * 0.06;
@@ -563,11 +573,11 @@ export default function ScrollHero() {
             size = lead.size * (0.9 + smoothEased * 0.3); // Grow slightly as they settle
             isGlowing = smoothEased > 0.5;
           } else {
-            // Non-converted leads fade out quickly and disappear
-            x = centerX;
-            y = funnelBottomY - 10;
-            opacity = Math.max(0, lead.opacity * 0.1 * (1 - eased * 3)); // Faster fade
-            size = lead.size * (1 - eased * 0.5);
+            // Non-converted leads are completely invisible in Stage 3
+            x = 0;
+            y = 0;
+            opacity = 0;
+            size = 0;
           }
         }
 
