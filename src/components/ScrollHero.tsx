@@ -384,12 +384,12 @@ export default function ScrollHero() {
       const funnelTopY = height * 0.18;
       const funnelBottomY = height * 0.82;
 
-      // Draw funnel (fades out as calendar appears)
-      if (progress > 0.1 && progress < 0.85) {
+      // Draw funnel (fades out completely before calendar appears)
+      if (progress > 0.1 && progress < 0.78) {
         const funnelOpacity = progress < 0.2
           ? (progress - 0.1) / 0.1
           : progress > 0.72
-            ? 1 - (progress - 0.72) / 0.13
+            ? 1 - (progress - 0.72) / 0.06 // Faster fade out
             : 1;
         drawFunnel(ctx, width, height, funnelOpacity);
       }
@@ -526,14 +526,14 @@ export default function ScrollHero() {
           const cellHeight = (calHeight - 30) / rows;
           const headerHeight = 30;
 
-          // Predefined slots for converted leads
+          // Predefined slots for converted leads (avoid row 0 to not overlap day headers)
           const slotAssignments = [
-            { row: 0, col: 1 }, // Tue morning
-            { row: 1, col: 3 }, // Thu mid-morning
-            { row: 2, col: 0 }, // Mon afternoon
-            { row: 0, col: 4 }, // Fri morning
-            { row: 3, col: 2 }, // Wed late
-            { row: 1, col: 0 }, // Mon mid-morning
+            { row: 1, col: 1 }, // Tue
+            { row: 2, col: 3 }, // Thu
+            { row: 3, col: 0 }, // Mon
+            { row: 1, col: 4 }, // Fri
+            { row: 2, col: 2 }, // Wed
+            { row: 3, col: 1 }, // Tue
           ];
 
           if (lead.converted) {
@@ -544,9 +544,9 @@ export default function ScrollHero() {
             const startX = centerX;
             const startY = funnelBottomY + 10;
 
-            // Target position (calendar slot)
+            // Target position (calendar slot) - push down to avoid header overlap
             const targetX = calLeft + slot.col * cellWidth + cellWidth / 2;
-            const targetY = calTop + headerHeight + slot.row * cellHeight + cellHeight / 2 + 10;
+            const targetY = calTop + headerHeight + 25 + slot.row * cellHeight + cellHeight / 2;
 
             // Stagger the arrival - each lead has slight delay
             const staggerDelay = convertedIndex * 0.1;
@@ -559,10 +559,11 @@ export default function ScrollHero() {
             size = lead.size * (0.9 + smoothEased * 0.3); // Grow slightly as they settle
             isGlowing = smoothEased > 0.5;
           } else {
+            // Non-converted leads fade out quickly and disappear
             x = centerX;
             y = funnelBottomY - 10;
-            opacity = Math.max(0, lead.opacity * 0.15 * (1 - eased * 2));
-            size = lead.size * (1 - eased * 0.4);
+            opacity = Math.max(0, lead.opacity * 0.1 * (1 - eased * 3)); // Faster fade
+            size = lead.size * (1 - eased * 0.5);
           }
         }
 
