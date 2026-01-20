@@ -88,3 +88,10 @@ html {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Logo font */
+.font-logo {
+  font-family: var(--font-logo), system-ui, sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
