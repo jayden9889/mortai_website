@@ -360,6 +360,20 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {[
               {
+                name: "Ad Creative",
+                price: "$500/mo",
+                description: "Scroll-stopping video ads crafted to convert cold traffic into paying customers.",
+                features: [
+                  "Luxury Video Production",
+                  "Ad Strategy & Scripting",
+                  "Platform Optimization",
+                  "Performance Creative",
+                  "Monthly Creative Refresh"
+                ],
+                cta: "Book a Call",
+                popular: false
+              },
+              {
                 name: "AI Outreach",
                 price: "$2,500/mo",
                 description: "Done-for-you AI email campaigns that book qualified calls on your calendar.",
@@ -375,29 +389,16 @@ export default function Home() {
                 popular: true
               },
               {
-                name: "Ad Creative",
-                price: "$500/mo",
-                description: "Scroll-stopping video ads crafted to convert cold traffic into paying customers.",
-                features: [
-                  "Luxury Video Production",
-                  "Ad Strategy & Scripting",
-                  "Platform Optimization",
-                  "Performance Creative",
-                  "Monthly Creative Refresh"
-                ],
-                cta: "Book a Call",
-                popular: false
-              },
-              {
                 name: "Full Growth",
-                price: "$6,500/mo",
+                price: "$4,500/mo",
                 description: "The complete growth engine. Outreach + ads + strategy, fully managed by us.",
                 features: [
                   "Everything in AI Outreach",
                   "Everything in Ad Creative",
                   "Dedicated Growth Strategist",
                   "Priority Slack Support",
-                  "Monthly Growth Reviews"
+                  "Monthly Growth Reviews",
+                  "Operations Audit & Automation Strategy"
                 ],
                 cta: "Book a Call",
                 popular: false
