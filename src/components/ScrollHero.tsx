@@ -425,10 +425,14 @@ export default function ScrollHero() {
           opacity = lead.opacity;
           size = lead.size;
 
-        } else if (progress < 0.28) {
+        } else if (progress < 0.38) {
           // Stage 1: Converge into color groups (coral left, teal right)
-          const convergeProgress = (progress - 0.12) / 0.16;
-          const eased = 1 - Math.pow(1 - convergeProgress, 3);
+          // Extended duration for smoother, longer animation
+          const convergeProgress = (progress - 0.12) / 0.26;
+          // Ease-in-out for smooth start AND end (not snappy)
+          const eased = convergeProgress < 0.5
+            ? 2 * Math.pow(convergeProgress, 2)
+            : 1 - Math.pow(-2 * convergeProgress + 2, 2) / 2;
 
           const groupSpread = topWidth * 0.35;
           const baseX = centerX + sideMultiplier * groupSpread;
@@ -448,7 +452,7 @@ export default function ScrollHero() {
 
         } else if (progress < 0.72) {
           // Stage 2: STAGGERED FALL - bottom rows fall first, then upper rows follow
-          const fallProgress = (progress - 0.28) / 0.44;
+          const fallProgress = (progress - 0.38) / 0.34;
 
           // Calculate this lead's row in the grouped formation (0 = top row, higher = lower)
           const row = Math.floor(lead.groupIndex / 6);
@@ -593,15 +597,76 @@ export default function ScrollHero() {
     const trigger = ScrollTrigger.create({
       trigger: container,
       start: 'top top',
-      end: '+=250%', // Comfortable scroll distance
+      end: '+=300%', // Longer scroll distance for smoother feel
       pin: true,
-      scrub: 1, // 1:1 mapping for natural feel
-      onUpdate: (self) => {
-        progressRef.current = self.progress;
+      scrub: 2.5, // Higher = more smoothing/resistance feel
+      snap: {
+        // Snap to transition boundaries with resistance
+        snapTo: (progress) => {
+          // Define snap points at stage transitions (updated for extended Stage 1)
+          const snapPoints = [0, 0.12, 0.38, 0.72, 1];
 
-        if (self.progress < 0.12) setCurrentStage(0);
-        else if (self.progress < 0.28) setCurrentStage(1);
-        else if (self.progress < 0.72) setCurrentStage(2);
+          // Find the closest snap point
+          let closest = snapPoints[0];
+          let minDist = Math.abs(progress - closest);
+
+          for (const point of snapPoints) {
+            const dist = Math.abs(progress - point);
+            if (dist < minDist) {
+              minDist = dist;
+              closest = point;
+            }
+          }
+
+          // Stronger snap at Stage 1 (AI-Powered Discovery)
+          const snapThreshold = closest === 0.12 ? 0.08 : 0.05;
+
+          // Only snap if we're close to a transition point
+          // This creates "sticky" zones at each transition
+          if (minDist < snapThreshold) {
+            return closest;
+          }
+
+          // Otherwise, let it move freely
+          return progress;
+        },
+        duration: { min: 0.4, max: 0.8 },
+        delay: 0.05,
+        ease: 'power2.inOut',
+      },
+      onUpdate: (self) => {
+        // Apply resistance near transition points by remapping progress
+        // This creates "sticky" zones where scrolling feels harder
+        const raw = self.progress;
+        let adjusted = raw;
+
+        // Transition points: 0.12, 0.38, 0.72 (updated)
+        // Create resistance zones around each transition
+        // Extra resistance at 0.12 to keep "AI-Powered Discovery" on screen longer
+        const transitions = [
+          { point: 0.12, width: 0.06, strength: 0.2 }, // Stronger resistance at AI Discovery
+          { point: 0.38, width: 0.04, strength: 0.35 },
+          { point: 0.72, width: 0.04, strength: 0.35 },
+        ];
+
+        for (const t of transitions) {
+          const distFromTransition = Math.abs(raw - t.point);
+          if (distFromTransition < t.width) {
+            // We're in a resistance zone - slow down progress
+            const resistanceFactor = 1 - (1 - t.strength) * (1 - distFromTransition / t.width);
+            if (raw < t.point) {
+              adjusted = t.point - (t.point - raw) / resistanceFactor;
+            } else {
+              adjusted = t.point + (raw - t.point) / resistanceFactor;
+            }
+          }
+        }
+
+        progressRef.current = adjusted;
+
+        if (adjusted < 0.12) setCurrentStage(0);
+        else if (adjusted < 0.38) setCurrentStage(1);
+        else if (adjusted < 0.72) setCurrentStage(2);
         else setCurrentStage(3);
       },
     });
