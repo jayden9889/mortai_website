@@ -1,0 +1,22 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Chip/processor base -->
+  <rect x="8" y="12" width="20" height="20" rx="4" fill="#1a2733"/>
+  <rect x="8" y="12" width="20" height="20" rx="4" stroke="#00D4C8" stroke-width="1"/>
+
+  <!-- M letter -->
+  <text x="18" y="26" font-family="system-ui" font-weight="bold" font-size="12" fill="white" text-anchor="middle">M</text>
+
+  <!-- Chip connectors -->
+  <rect x="4" y="18" width="4" height="2" rx="1" fill="#00D4C8"/>
+  <rect x="4" y="22" width="4" height="2" rx="1" fill="#00D4C8"/>
+  <rect x="4" y="26" width="4" height="2" rx="1" fill="#00D4C8"/>
+
+  <!-- Head silhouette -->
+  <path d="M28 10 C38 10 42 18 42 26 C42 34 38 42 32 42 C28 42 26 38 26 34 L26 32"
+        stroke="#00D4C8" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Brain waves -->
+  <path d="M30 18 Q33 16 36 18 Q39 20 36 22" stroke="#00D4C8" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M30 24 Q33 22 36 24 Q39 26 36 28" stroke="#00D4C8" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M30 30 Q33 28 36 30" stroke="#00D4C8" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

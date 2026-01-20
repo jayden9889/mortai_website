@@ -6,6 +6,16 @@ token.json
 # Temporary/intermediate files
 .tmp/
 
+# Next.js
+.next/
+out/
+node_modules/
+.vercel/
+
+# Testing
+test-results/
+playwright-report/
+
 # Claude memory (personal chat history)
 .claude/memory/
 .claude/settings.local.json
