@@ -751,7 +751,10 @@ export default function ScrollHero() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
+      <div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3 transition-opacity duration-500"
+        style={{ opacity: currentStage === 3 ? 0 : 1 }}
+      >
         {stages.map((_, i) => (
           <div
             key={i}
