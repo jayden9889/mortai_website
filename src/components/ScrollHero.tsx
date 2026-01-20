@@ -425,10 +425,10 @@ export default function ScrollHero() {
           opacity = lead.opacity;
           size = lead.size;
 
-        } else if (progress < 0.38) {
+        } else if (progress < 0.48) {
           // Stage 1: Converge into color groups (coral left, teal right)
           // Extended duration for smoother, longer animation
-          const convergeProgress = (progress - 0.12) / 0.26;
+          const convergeProgress = (progress - 0.12) / 0.36;
           // Ease-in-out for smooth start AND end (not snappy)
           const eased = convergeProgress < 0.5
             ? 2 * Math.pow(convergeProgress, 2)
@@ -452,7 +452,7 @@ export default function ScrollHero() {
 
         } else if (progress < 0.72) {
           // Stage 2: STAGGERED FALL - bottom rows fall first, then upper rows follow
-          const fallProgress = (progress - 0.38) / 0.34;
+          const fallProgress = (progress - 0.48) / 0.24;
 
           // Calculate this lead's row in the grouped formation (0 = top row, higher = lower)
           const row = Math.floor(lead.groupIndex / 6);
@@ -604,7 +604,7 @@ export default function ScrollHero() {
         // Snap to transition boundaries with resistance
         snapTo: (progress) => {
           // Define snap points at stage transitions (updated for extended Stage 1)
-          const snapPoints = [0, 0.12, 0.38, 0.72, 1];
+          const snapPoints = [0, 0.12, 0.48, 0.72, 1];
 
           // Find the closest snap point
           let closest = snapPoints[0];
@@ -640,12 +640,12 @@ export default function ScrollHero() {
         const raw = self.progress;
         let adjusted = raw;
 
-        // Transition points: 0.12, 0.38, 0.72 (updated)
+        // Transition points: 0.12, 0.48, 0.72 (updated)
         // Create resistance zones around each transition
         // Extra resistance at 0.12 to keep "AI-Powered Discovery" on screen longer
         const transitions = [
           { point: 0.12, width: 0.06, strength: 0.2 }, // Stronger resistance at AI Discovery
-          { point: 0.38, width: 0.04, strength: 0.35 },
+          { point: 0.48, width: 0.04, strength: 0.35 },
           { point: 0.72, width: 0.04, strength: 0.35 },
         ];
 
@@ -665,7 +665,7 @@ export default function ScrollHero() {
         progressRef.current = adjusted;
 
         if (adjusted < 0.12) setCurrentStage(0);
-        else if (adjusted < 0.38) setCurrentStage(1);
+        else if (adjusted < 0.48) setCurrentStage(1);
         else if (adjusted < 0.72) setCurrentStage(2);
         else setCurrentStage(3);
       },
