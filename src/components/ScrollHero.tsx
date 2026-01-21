@@ -360,11 +360,11 @@ export default function ScrollHero() {
         drawFunnel(ctx, width, height, Math.max(0, funnelOpacity));
       }
 
-      // Draw calendar in Stage 3 - positioned below the "Booked Calls" heading
+      // Draw calendar in Stage 3 - positioned below the "Booked Calls" heading (which is at top)
       if (progress > 0.72) {
         const calendarOpacity = Math.min(1, (progress - 0.72) / 0.12);
-        // Position calendar well below the heading
-        const calendarCenterY = height * 0.65;
+        // Calendar centered in the space below the heading
+        const calendarCenterY = height * 0.55;
         drawCalendar(ctx, centerX, calendarCenterY, calendarOpacity);
       }
 
@@ -482,7 +482,7 @@ export default function ScrollHero() {
           // Calendar dimensions (match drawCalendar)
           const calWidth = 400;
           const calHeight = 380;
-          const calendarCenterY = height * 0.65; // Well below the heading
+          const calendarCenterY = height * 0.55; // Centered below heading at top
           const calLeft = centerX - calWidth / 2;
           const calTop = calendarCenterY - calHeight / 2;
           const cols = 5;
@@ -622,7 +622,9 @@ export default function ScrollHero() {
           {stages.map((stage, i) => (
             <div
               key={i}
-              className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-500"
+              className={`absolute inset-0 flex flex-col items-center transition-all duration-500 ${
+                i === 3 ? 'justify-start pt-16' : 'justify-center'
+              }`}
               style={{
                 opacity: currentStage === i ? 1 : 0,
                 transform: `translateY(${currentStage === i ? 0 : currentStage > i ? -40 : 40}px)`,
