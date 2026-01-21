@@ -173,11 +173,11 @@ function drawCalendar(
 
 function drawFunnel(ctx: CanvasRenderingContext2D, width: number, height: number, opacity: number) {
   const centerX = width / 2;
-  const topY = height * 0.15;
-  const bottomY = height * 0.70;
-  const topWidth = Math.min(340, width * 0.32);
-  const bottomWidth = 35;
-  const spoutHeight = height * 0.12;
+  const topY = height * 0.22;
+  const bottomY = height * 0.58;
+  const topWidth = Math.min(260, width * 0.24);
+  const bottomWidth = 28;
+  const spoutHeight = height * 0.08;
   const spoutBottomY = bottomY + spoutHeight;
 
   // Clean glass-like gradient for funnel body
@@ -336,12 +336,12 @@ export default function ScrollHero() {
 
     leadsRef.current = leads;
 
-    // Funnel dimensions
-    const funnelTopY = height * 0.15;
-    const funnelBottomY = height * 0.70;
-    const topWidth = Math.min(340, width * 0.32);
-    const bottomWidth = 35;
-    const spoutHeight = height * 0.12;
+    // Funnel dimensions (smaller, positioned lower)
+    const funnelTopY = height * 0.22;
+    const funnelBottomY = height * 0.58;
+    const topWidth = Math.min(260, width * 0.24);
+    const bottomWidth = 28;
+    const spoutHeight = height * 0.08;
 
     const animate = () => {
       ctx.clearRect(0, 0, width, height);
@@ -399,8 +399,8 @@ export default function ScrollHero() {
 
             // Target: above the funnel opening, slightly spread out
             const spreadAbove = ((lead.groupIndex % 12) - 6) / 6;
-            const targetX = centerX + spreadAbove * topWidth * 0.5;
-            const targetY = funnelTopY - 60; // Above the funnel rim
+            const targetX = centerX + spreadAbove * topWidth * 0.6;
+            const targetY = funnelTopY - 35; // Just above the funnel rim
 
             x = lead.startX + (targetX - lead.startX) * eased;
             y = lead.startY + (targetY - lead.startY) * eased;
@@ -413,13 +413,13 @@ export default function ScrollHero() {
 
             // Start: convergence point above funnel
             const spreadAbove = ((lead.groupIndex % 12) - 6) / 6;
-            const startX = centerX + spreadAbove * topWidth * 0.5;
-            const startY = funnelTopY - 60;
+            const startX = centerX + spreadAbove * topWidth * 0.6;
+            const startY = funnelTopY - 35;
 
             // Target: just inside the funnel opening
             const spreadInFunnel = ((lead.groupIndex % 10) - 5) / 5;
-            const targetX = centerX + spreadInFunnel * topWidth * 0.6;
-            const targetY = funnelTopY + 40;
+            const targetX = centerX + spreadInFunnel * topWidth * 0.5;
+            const targetY = funnelTopY + 30;
 
             x = startX + (targetX - startX) * eased;
             y = startY + (targetY - startY) * eased;
@@ -444,8 +444,8 @@ export default function ScrollHero() {
 
           // Start position: just inside funnel opening (where Stage 1 ended)
           const spreadInFunnel = ((lead.groupIndex % 10) - 5) / 5;
-          const startFunnelX = centerX + spreadInFunnel * topWidth * 0.6;
-          const startFunnelY = funnelTopY + 40;
+          const startFunnelX = centerX + spreadInFunnel * topWidth * 0.5;
+          const startFunnelY = funnelTopY + 30;
 
           // Calculate fall depth through the funnel
           const funnelDepth = Math.min(1, eased);
@@ -456,7 +456,7 @@ export default function ScrollHero() {
           const laneOffset = ((lead.funnelLane % 8) / 8 - 0.5) * 0.4 + colorOffset;
 
           const targetX = centerX + laneOffset * currentWidth;
-          const targetY = funnelTopY + 40 + (funnelBottomY + spoutHeight - funnelTopY - 40) * funnelDepth;
+          const targetY = funnelTopY + 30 + (funnelBottomY + spoutHeight - funnelTopY - 30) * funnelDepth;
 
           if (delayedProgress <= 0) {
             x = startFunnelX;
