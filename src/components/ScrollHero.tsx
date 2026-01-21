@@ -351,11 +351,11 @@ export default function ScrollHero() {
       const centerX = width / 2;
 
       // Draw funnel (visible in stages 1 and 2)
-      if (progress > 0.12 && progress < 0.75) {
-        const funnelOpacity = progress < 0.20
-          ? (progress - 0.12) / 0.08
-          : progress > 0.68
-            ? 1 - (progress - 0.68) / 0.07
+      if (progress > 0.03 && progress < 0.72) {
+        const funnelOpacity = progress < 0.10
+          ? (progress - 0.03) / 0.07
+          : progress > 0.65
+            ? 1 - (progress - 0.65) / 0.07
             : 1;
         drawFunnel(ctx, width, height, Math.max(0, funnelOpacity));
       }
@@ -363,8 +363,8 @@ export default function ScrollHero() {
       // Draw calendar in Stage 3 - positioned below the "Booked Calls" heading
       if (progress > 0.72) {
         const calendarOpacity = Math.min(1, (progress - 0.72) / 0.12);
-        // Position calendar below the heading (which is centered)
-        const calendarCenterY = height * 0.58;
+        // Position calendar well below the heading
+        const calendarCenterY = height * 0.65;
         drawCalendar(ctx, centerX, calendarCenterY, calendarOpacity);
       }
 
@@ -375,8 +375,8 @@ export default function ScrollHero() {
 
         const isWarm = lead.color === 'warm';
 
-        if (progress < 0.12) {
-          // Stage 0: Scattered with gentle float
+        if (progress < 0.03) {
+          // Stage 0: Scattered with gentle float (very brief - animation starts almost immediately)
           const floatX = Math.sin(time * 0.0006 * lead.speed + lead.angle) * 8;
           const floatY = Math.cos(time * 0.0005 * lead.speed + lead.angle) * 6;
 
@@ -385,9 +385,9 @@ export default function ScrollHero() {
           opacity = lead.opacity;
           size = lead.size;
 
-        } else if (progress < 0.42) {
+        } else if (progress < 0.38) {
           // Stage 1: Converge ABOVE the funnel, then pour in from top
-          const stageProgress = (progress - 0.12) / 0.30;
+          const stageProgress = (progress - 0.03) / 0.35;
 
           // Two phases: first converge above funnel (0-0.6), then drop into funnel opening (0.6-1.0)
           if (stageProgress < 0.6) {
@@ -427,9 +427,9 @@ export default function ScrollHero() {
             size = lead.size * (0.95 - eased * 0.05);
           }
 
-        } else if (progress < 0.75) {
+        } else if (progress < 0.72) {
           // Stage 2: Fall through funnel from top, sort by color
-          const stageProgress = (progress - 0.42) / 0.33;
+          const stageProgress = (progress - 0.38) / 0.34;
 
           // Staggered fall based on position
           const row = Math.floor(lead.groupIndex / 6);
@@ -476,13 +476,13 @@ export default function ScrollHero() {
 
         } else {
           // Stage 3: Converted fly to calendar
-          const stageProgress = (progress - 0.75) / 0.25;
+          const stageProgress = (progress - 0.72) / 0.28;
           const eased = 1 - Math.pow(1 - stageProgress, 2.5);
 
           // Calendar dimensions (match drawCalendar)
           const calWidth = 400;
           const calHeight = 380;
-          const calendarCenterY = height * 0.58; // Below the heading
+          const calendarCenterY = height * 0.65; // Well below the heading
           const calLeft = centerX - calWidth / 2;
           const calTop = calendarCenterY - calHeight / 2;
           const cols = 5;
@@ -576,9 +576,9 @@ export default function ScrollHero() {
       onUpdate: (self) => {
         progressRef.current = self.progress;
 
-        if (self.progress < 0.12) setCurrentStage(0);
-        else if (self.progress < 0.42) setCurrentStage(1);
-        else if (self.progress < 0.75) setCurrentStage(2);
+        if (self.progress < 0.03) setCurrentStage(0);
+        else if (self.progress < 0.38) setCurrentStage(1);
+        else if (self.progress < 0.72) setCurrentStage(2);
         else setCurrentStage(3);
       },
     });
