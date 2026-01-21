@@ -202,10 +202,13 @@ function drawCalendar(
 function drawFunnel(ctx: CanvasRenderingContext2D, width: number, height: number, opacity: number) {
   const centerX = width / 2;
   const topY = height * 0.18;
-  const bottomY = height * 0.82;
+  const bottomY = height * 0.72; // Where the cone ends and spout begins
   const topWidth = Math.min(380, width * 0.35);
-  const bottomWidth = 45;
+  const bottomWidth = 30; // Width of the spout
+  const spoutHeight = height * 0.18; // Length of the cylindrical spout
+  const spoutBottomY = bottomY + spoutHeight;
 
+  // Outer glow for cone
   const glowGradient = ctx.createLinearGradient(centerX - topWidth, topY, centerX + topWidth, topY);
   glowGradient.addColorStop(0, `rgba(0, 212, 200, ${0.05 * opacity})`);
   glowGradient.addColorStop(0.5, `rgba(0, 255, 229, ${0.1 * opacity})`);
@@ -214,42 +217,66 @@ function drawFunnel(ctx: CanvasRenderingContext2D, width: number, height: number
   ctx.fillStyle = glowGradient;
   ctx.beginPath();
   ctx.moveTo(centerX - topWidth - 20, topY);
-  ctx.quadraticCurveTo(centerX - topWidth - 25, height * 0.5, centerX - bottomWidth - 15, bottomY);
-  ctx.lineTo(centerX + bottomWidth + 15, bottomY);
-  ctx.quadraticCurveTo(centerX + topWidth + 25, height * 0.5, centerX + topWidth + 20, topY);
+  ctx.quadraticCurveTo(centerX - topWidth - 25, height * 0.45, centerX - bottomWidth - 10, bottomY);
+  ctx.lineTo(centerX + bottomWidth + 10, bottomY);
+  ctx.quadraticCurveTo(centerX + topWidth + 25, height * 0.45, centerX + topWidth + 20, topY);
   ctx.closePath();
   ctx.fill();
 
-  const funnelGradient = ctx.createLinearGradient(centerX, topY, centerX, bottomY);
+  // Main funnel cone gradient
+  const funnelGradient = ctx.createLinearGradient(centerX, topY, centerX, spoutBottomY);
   funnelGradient.addColorStop(0, `rgba(0, 212, 200, ${0.03 * opacity})`);
   funnelGradient.addColorStop(0.3, `rgba(0, 212, 200, ${0.08 * opacity})`);
-  funnelGradient.addColorStop(0.7, `rgba(0, 255, 229, ${0.12 * opacity})`);
+  funnelGradient.addColorStop(0.6, `rgba(0, 255, 229, ${0.12 * opacity})`);
   funnelGradient.addColorStop(1, `rgba(0, 255, 229, ${0.2 * opacity})`);
 
+  // Draw cone part
   ctx.fillStyle = funnelGradient;
   ctx.beginPath();
   ctx.moveTo(centerX - topWidth, topY);
-  ctx.quadraticCurveTo(centerX - topWidth, height * 0.5, centerX - bottomWidth, bottomY);
+  ctx.quadraticCurveTo(centerX - topWidth, height * 0.45, centerX - bottomWidth, bottomY);
   ctx.lineTo(centerX + bottomWidth, bottomY);
-  ctx.quadraticCurveTo(centerX + topWidth, height * 0.5, centerX + topWidth, topY);
+  ctx.quadraticCurveTo(centerX + topWidth, height * 0.45, centerX + topWidth, topY);
   ctx.closePath();
   ctx.fill();
 
+  // Draw spout (cylindrical tube)
+  ctx.fillStyle = funnelGradient;
+  ctx.beginPath();
+  ctx.rect(centerX - bottomWidth, bottomY, bottomWidth * 2, spoutHeight);
+  ctx.fill();
+
+  // Stroke the funnel edges
   ctx.strokeStyle = `rgba(0, 212, 200, ${0.4 * opacity})`;
   ctx.lineWidth = 2;
   ctx.shadowColor = 'rgba(0, 255, 229, 0.5)';
   ctx.shadowBlur = 10 * opacity;
 
+  // Left edge of cone
   ctx.beginPath();
   ctx.moveTo(centerX - topWidth, topY);
-  ctx.quadraticCurveTo(centerX - topWidth, height * 0.5, centerX - bottomWidth, bottomY);
+  ctx.quadraticCurveTo(centerX - topWidth, height * 0.45, centerX - bottomWidth, bottomY);
   ctx.stroke();
 
+  // Right edge of cone
   ctx.beginPath();
   ctx.moveTo(centerX + topWidth, topY);
-  ctx.quadraticCurveTo(centerX + topWidth, height * 0.5, centerX + bottomWidth, bottomY);
+  ctx.quadraticCurveTo(centerX + topWidth, height * 0.45, centerX + bottomWidth, bottomY);
   ctx.stroke();
 
+  // Left edge of spout
+  ctx.beginPath();
+  ctx.moveTo(centerX - bottomWidth, bottomY);
+  ctx.lineTo(centerX - bottomWidth, spoutBottomY);
+  ctx.stroke();
+
+  // Right edge of spout
+  ctx.beginPath();
+  ctx.moveTo(centerX + bottomWidth, bottomY);
+  ctx.lineTo(centerX + bottomWidth, spoutBottomY);
+  ctx.stroke();
+
+  // Top rim of funnel
   ctx.strokeStyle = `rgba(0, 255, 229, ${0.3 * opacity})`;
   ctx.lineWidth = 3;
   ctx.beginPath();
@@ -257,34 +284,51 @@ function drawFunnel(ctx: CanvasRenderingContext2D, width: number, height: number
   ctx.quadraticCurveTo(centerX, topY - 15, centerX + topWidth, topY);
   ctx.stroke();
 
-  const bottomGlow = ctx.createRadialGradient(centerX, bottomY, 0, centerX, bottomY, bottomWidth * 2);
-  bottomGlow.addColorStop(0, `rgba(0, 255, 229, ${0.3 * opacity})`);
-  bottomGlow.addColorStop(0.5, `rgba(0, 212, 200, ${0.1 * opacity})`);
+  // Bottom glow at spout exit
+  const bottomGlow = ctx.createRadialGradient(centerX, spoutBottomY, 0, centerX, spoutBottomY, bottomWidth * 2.5);
+  bottomGlow.addColorStop(0, `rgba(0, 255, 229, ${0.4 * opacity})`);
+  bottomGlow.addColorStop(0.5, `rgba(0, 212, 200, ${0.15 * opacity})`);
   bottomGlow.addColorStop(1, 'rgba(0, 212, 200, 0)');
 
   ctx.fillStyle = bottomGlow;
   ctx.beginPath();
-  ctx.arc(centerX, bottomY, bottomWidth * 2, 0, Math.PI * 2);
+  ctx.arc(centerX, spoutBottomY, bottomWidth * 2.5, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.shadowBlur = 0;
 
+  // Particles flowing down
   const particleCount = 8;
   const time = Date.now() * 0.001;
   for (let i = 0; i < particleCount; i++) {
     const t = ((time * 0.3 + i / particleCount) % 1);
-    const leftX = centerX - topWidth + (topWidth - bottomWidth) * t;
-    const rightX = centerX + topWidth - (topWidth - bottomWidth) * t;
-    const py = topY + (bottomY - topY) * t;
-    const particleOpacity = Math.sin(t * Math.PI) * 0.5 * opacity;
 
-    ctx.fillStyle = `rgba(0, 255, 229, ${particleOpacity})`;
-    ctx.beginPath();
-    ctx.arc(leftX, py, 2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(rightX, py, 2, 0, Math.PI * 2);
-    ctx.fill();
+    if (t < 0.75) {
+      // Particles in the cone section
+      const coneT = t / 0.75;
+      const leftX = centerX - topWidth + (topWidth - bottomWidth) * coneT;
+      const rightX = centerX + topWidth - (topWidth - bottomWidth) * coneT;
+      const py = topY + (bottomY - topY) * coneT;
+      const particleOpacity = Math.sin(coneT * Math.PI) * 0.5 * opacity;
+
+      ctx.fillStyle = `rgba(0, 255, 229, ${particleOpacity})`;
+      ctx.beginPath();
+      ctx.arc(leftX, py, 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(rightX, py, 2, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // Particles in the spout section
+      const spoutT = (t - 0.75) / 0.25;
+      const py = bottomY + spoutHeight * spoutT;
+      const particleOpacity = (1 - spoutT) * 0.5 * opacity;
+
+      ctx.fillStyle = `rgba(0, 255, 229, ${particleOpacity})`;
+      ctx.beginPath();
+      ctx.arc(centerX, py, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 }
 
