@@ -31,7 +31,7 @@ function Logo({ size = 'default' }: { size?: 'small' | 'default' | 'large' }) {
   const s = sizes[size];
 
   return (
-    <a href="#" className="flex items-center gap-2 group">
+    <a href="/" className="flex items-center gap-2 group">
       <Image
         src="/logo.png"
         alt="MortAi"
@@ -88,7 +88,7 @@ export default function Home() {
             <a href="#faq" className="text-sm transition-colors hover:text-white" style={{ color: 'var(--color-text-secondary)' }}>FAQ</a>
           </div>
           <a
-            href="#services"
+            href="/book"
             className="px-5 py-2 rounded-full text-sm font-medium transition-all hover:opacity-90"
             style={{
               background: 'var(--color-accent)',
@@ -115,7 +115,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="#services"
+              href="/book"
               className="px-8 py-4 rounded-full font-semibold text-lg transition-all hover:scale-105 glow-accent"
               style={{
                 background: 'var(--color-accent)',
@@ -457,9 +457,20 @@ export default function Home() {
             <p className="text-sm mb-2" style={{ color: 'var(--color-accent)' }}>
               Founding Client Program
             </p>
-            <p style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="mb-4" style={{ color: 'var(--color-text-secondary)' }}>
               We're selectively onboarding founding clients who want priority access and preferential rates. Limited spots as we build our case study portfolio.
             </p>
+            <a
+              href="/book"
+              className="inline-block px-6 py-2 rounded-full text-sm font-medium transition-all hover:scale-105"
+              style={{
+                background: 'transparent',
+                color: 'var(--color-accent)',
+                border: '1px solid var(--color-accent)'
+              }}
+            >
+              Apply for Founding Access
+            </a>
           </div>
         </div>
       </section>
@@ -503,7 +514,7 @@ export default function Home() {
                 <div
                   className="overflow-hidden transition-all duration-300"
                   style={{
-                    maxHeight: openFaq === i ? '200px' : '0px',
+                    maxHeight: openFaq === i ? '500px' : '0px',
                     opacity: openFaq === i ? 1 : 0
                   }}
                 >
