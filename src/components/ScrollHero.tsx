@@ -360,11 +360,11 @@ export default function ScrollHero() {
         drawFunnel(ctx, width, height, Math.max(0, funnelOpacity));
       }
 
-      // Draw calendar in Stage 3
+      // Draw calendar in Stage 3 - positioned below the "Booked Calls" heading
       if (progress > 0.72) {
         const calendarOpacity = Math.min(1, (progress - 0.72) / 0.12);
-        // Position calendar in center of screen
-        const calendarCenterY = height * 0.5;
+        // Position calendar below the heading (which is centered)
+        const calendarCenterY = height * 0.58;
         drawCalendar(ctx, centerX, calendarCenterY, calendarOpacity);
       }
 
@@ -386,53 +386,77 @@ export default function ScrollHero() {
           size = lead.size;
 
         } else if (progress < 0.42) {
-          // Stage 1: Move to funnel top and enter
+          // Stage 1: Converge ABOVE the funnel, then pour in from top
           const stageProgress = (progress - 0.12) / 0.30;
-          // Smooth ease-in-out
-          const eased = stageProgress < 0.5
-            ? 2 * stageProgress * stageProgress
-            : 1 - Math.pow(-2 * stageProgress + 2, 2) / 2;
 
-          // Target: funnel opening at top
-          const spreadInFunnel = ((lead.groupIndex % 10) - 5) / 5;
-          const targetX = centerX + spreadInFunnel * topWidth * 0.7;
-          const targetY = funnelTopY + 30;
+          // Two phases: first converge above funnel (0-0.6), then drop into funnel opening (0.6-1.0)
+          if (stageProgress < 0.6) {
+            // Phase 1: Move to convergence point ABOVE the funnel
+            const phase1Progress = stageProgress / 0.6;
+            const eased = phase1Progress < 0.5
+              ? 2 * phase1Progress * phase1Progress
+              : 1 - Math.pow(-2 * phase1Progress + 2, 2) / 2;
 
-          x = lead.startX + (targetX - lead.startX) * eased;
-          y = lead.startY + (targetY - lead.startY) * eased;
-          opacity = lead.opacity;
-          size = lead.size * (1 - eased * 0.1);
+            // Target: above the funnel opening, slightly spread out
+            const spreadAbove = ((lead.groupIndex % 12) - 6) / 6;
+            const targetX = centerX + spreadAbove * topWidth * 0.5;
+            const targetY = funnelTopY - 60; // Above the funnel rim
+
+            x = lead.startX + (targetX - lead.startX) * eased;
+            y = lead.startY + (targetY - lead.startY) * eased;
+            opacity = lead.opacity;
+            size = lead.size * (1 - eased * 0.05);
+          } else {
+            // Phase 2: Drop into funnel opening from above
+            const phase2Progress = (stageProgress - 0.6) / 0.4;
+            const eased = Math.pow(phase2Progress, 1.5); // Gravity-like drop
+
+            // Start: convergence point above funnel
+            const spreadAbove = ((lead.groupIndex % 12) - 6) / 6;
+            const startX = centerX + spreadAbove * topWidth * 0.5;
+            const startY = funnelTopY - 60;
+
+            // Target: just inside the funnel opening
+            const spreadInFunnel = ((lead.groupIndex % 10) - 5) / 5;
+            const targetX = centerX + spreadInFunnel * topWidth * 0.6;
+            const targetY = funnelTopY + 40;
+
+            x = startX + (targetX - startX) * eased;
+            y = startY + (targetY - startY) * eased;
+            opacity = lead.opacity;
+            size = lead.size * (0.95 - eased * 0.05);
+          }
 
         } else if (progress < 0.75) {
-          // Stage 2: Fall through funnel, sort by color
+          // Stage 2: Fall through funnel from top, sort by color
           const stageProgress = (progress - 0.42) / 0.33;
 
           // Staggered fall based on position
           const row = Math.floor(lead.groupIndex / 6);
           const posInRow = lead.groupIndex % 6;
-          const rowDelay = row * 0.08;
-          const inRowDelay = posInRow * 0.01;
+          const rowDelay = row * 0.06;
+          const inRowDelay = posInRow * 0.008;
           const totalDelay = rowDelay + inRowDelay;
 
           const delayedProgress = Math.max(0, (stageProgress - totalDelay) / (1 - totalDelay));
-          // Gravity-like easing
-          const eased = delayedProgress < 1 ? Math.pow(delayedProgress, 1.6) : 1;
+          // Gravity-like easing for realistic fall
+          const eased = delayedProgress < 1 ? Math.pow(delayedProgress, 1.8) : 1;
 
-          // Start at funnel top
+          // Start position: just inside funnel opening (where Stage 1 ended)
           const spreadInFunnel = ((lead.groupIndex % 10) - 5) / 5;
-          const startFunnelX = centerX + spreadInFunnel * topWidth * 0.7;
-          const startFunnelY = funnelTopY + 30;
+          const startFunnelX = centerX + spreadInFunnel * topWidth * 0.6;
+          const startFunnelY = funnelTopY + 40;
 
-          // Fall position
+          // Calculate fall depth through the funnel
           const funnelDepth = Math.min(1, eased);
           const currentWidth = topWidth - (topWidth - bottomWidth) * funnelDepth;
 
-          // Sort by color as they fall
-          const colorOffset = isWarm ? -0.4 : 0.4;
-          const laneOffset = ((lead.funnelLane % 8) / 8 - 0.5) * 0.5 + colorOffset;
+          // Sort by color as they fall - warm to left, cool to right
+          const colorOffset = isWarm ? -0.35 : 0.35;
+          const laneOffset = ((lead.funnelLane % 8) / 8 - 0.5) * 0.4 + colorOffset;
 
           const targetX = centerX + laneOffset * currentWidth;
-          const targetY = funnelTopY + 30 + (funnelBottomY + spoutHeight - funnelTopY - 30) * funnelDepth;
+          const targetY = funnelTopY + 40 + (funnelBottomY + spoutHeight - funnelTopY - 40) * funnelDepth;
 
           if (delayedProgress <= 0) {
             x = startFunnelX;
@@ -442,13 +466,13 @@ export default function ScrollHero() {
             y = startFunnelY + (targetY - startFunnelY) * eased;
           }
 
-          // Non-converted fade out at bottom
+          // Non-converted fade out at bottom of funnel
           if (!lead.converted && funnelDepth > 0.65) {
             opacity = lead.opacity * (1 - (funnelDepth - 0.65) / 0.35);
           } else {
             opacity = lead.opacity;
           }
-          size = lead.size * (1 - funnelDepth * 0.15);
+          size = lead.size * (1 - funnelDepth * 0.12);
 
         } else {
           // Stage 3: Converted fly to calendar
@@ -458,7 +482,7 @@ export default function ScrollHero() {
           // Calendar dimensions (match drawCalendar)
           const calWidth = 400;
           const calHeight = 380;
-          const calendarCenterY = height * 0.5;
+          const calendarCenterY = height * 0.58; // Below the heading
           const calLeft = centerX - calWidth / 2;
           const calTop = calendarCenterY - calHeight / 2;
           const cols = 5;
